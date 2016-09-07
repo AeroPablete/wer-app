@@ -1,17 +1,15 @@
-// -- PACKAGES --
+// Get the packages we need
 var express = require('express'),
-    bodyParser = require('body-parser'),
+    mongoose = require('mongoose'),
     morgan = require('morgan'),
-    mongoose = require('mongoose')
+    bodyParser = require('body-parser'),
     path = require('path');
-
-var config = require('./config');
 
 // -- APP & DB --
 // Set App, Port and DataBase
 var app = express();
-var port = process.env.PORT || 8080;
-mongoose.connect(config.database);
+var port = process.env.PORT || 3000;
+mongoose.connect('mongodb://localhost:27017/wer-app-db2');
 
 // -- APP CONFIGURATION --
 // Use Body Parser so we can grab information from POST request
@@ -31,20 +29,23 @@ app.use(function(req, res, next) {
 // Log All Requests to the console
 app.use(morgan('dev'));
 
-// -- API ROUTES --
-// Set Initial Data Route
-app.get('/data', function(req, res) {
+// -- ROUTER --
+var apiRouter = express.Router();
 
-  console.log('Initial Data');
-});
+// Initial Data Route
+apiRouter.route('/set-data')
+  .get(function(req, res) { res.send('Set Initial Data') });
 
-// -- CLIENT --
-app.use(express.static(path.join(__dirname, '/client')));
+// Register all our routes with /api
+app.use('/api', apiRouter);
+
+// -- Setup CLIENT --
+app.use(express.static(path.join(__dirname, 'client')));
 app.get('*', function(req, res) {
 
-  res.sendFile(path.join(__dirname, '/client/app/index.html'));
-})
+  // Load the single view file -- AngularJS will handle the page changes on the front-end
+  res.sendFile(path.join(__dirname, 'client/index.html'));
+});
 
-// -- START THE SERVER --
 app.listen(port);
-console.log('Wer App is running on port ' + port);
+console.log('Insert beer on port ' + port);
