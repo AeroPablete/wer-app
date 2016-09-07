@@ -39,7 +39,7 @@ app.get('/data', function(req, res) {
 });
 
 // -- CLIENT --
-app.use(express.static(__dirname + '/client'));
+app.use(express.static(path.join(__dirname, '/client')));
 app.get('*', function(req, res) {
 
   res.sendFile(path.join(__dirname, '/client/app/index.html'));
